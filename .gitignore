@@ -1,0 +1,19 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# ADK / tool metadata
+.adk/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

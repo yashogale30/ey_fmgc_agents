@@ -5,21 +5,16 @@ import re
 import os
 from typing import List, Dict
 
-# ============================================================
-# CONFIGURATION - UPDATE THESE PATHS
-# ============================================================
 PRODUCT_DATABASE_PATH = os.getenv("PRODUCT_DB_PATH", "/Users/yashogale/codes/ey_agents/OEM_Product_Database.xlsx")
 
-# ============================================================
-# SPECIFICATION WEIGHTS & SYNONYMS (CRITICAL PARAMETERS)
-# ============================================================
+
 SPEC_WEIGHTS = {
-    'voltage': 0.25,       # Most critical - wrong voltage = complete failure
-    'standards': 0.20,     # Compliance is mandatory for government tenders
-    'conductor': 0.18,     # Material affects performance significantly
-    'insulation': 0.15,    # Important for safety and durability
-    'cores': 0.12,         # Affects capacity and application
-    'armoring': 0.10       # Protection level, less critical for some applications
+    'voltage': 0.25,       
+    'standards': 0.20,    
+    'conductor': 0.18,     
+    'insulation': 0.15,    
+    'cores': 0.12,         
+    'armoring': 0.10       
 }
 
 MATERIAL_SYNONYMS = {
@@ -326,7 +321,7 @@ def match_products_advanced(
         if weighted_score >= min_score:
             matches.append({
                 "product_id": row["Product_ID"],
-                "sku": row.get("SKU", row["Product_ID"]),  # Fallback to Product_ID
+                "sku": row.get("SKU", row["Product_ID"]),  
                 "product_name": row["Product_Name"],
                 "category": row["Category"],
                 "spec_match_percent": weighted_score,
@@ -341,7 +336,6 @@ def match_products_advanced(
                 "number_of_cores": int(row["Number_of_Cores"])
             })
     
-    # Sort by match score (descending)
     matches.sort(key=lambda x: x["spec_match_percent"], reverse=True)
     
     print(f"✓ Found {len(matches)} products matching ≥{min_score}% threshold")
@@ -488,72 +482,72 @@ root_agent = technical_agent
 # ============================================================
 # TEST EXECUTION
 # ============================================================
-if __name__ == "__main__":
-    print("\n" + "="*60)
-    print("Testing Technical Matching Agent")
-    print("="*60 + "\n")
+# if __name__ == "__main__":
+#     print("\n" + "="*60)
+#     print("Testing Technical Matching Agent")
+#     print("="*60 + "\n")
     
-    # Mock technical brief (as would come from Master Agent)
-    mock_technical_brief = {
-        "rfp_title": "Metro Phase 3 Power Cable Supply",
-        "category": "power cables",
-        "scope_of_supply": """
-        Supply of 11kV XLPE insulated power cables for metro project.
-        Cables must be 3-core with copper conductor.
-        """,
-        "technical_specifications": """
-        Voltage Rating: 11 kV
-        Conductor: Copper (Cu)
-        Insulation: XLPE (Cross-linked Polyethylene)
-        Cores: 3-core
-        Standards: IS 7098 Part 2, IEC 60502
-        Armoring: SWA (Steel Wire Armored)
-        BIS Certification: Required
-        """
-    }
+#     # Mock technical brief (as would come from Master Agent)
+#     mock_technical_brief = {
+#         "rfp_title": "Metro Phase 3 Power Cable Supply",
+#         "category": "power cables",
+#         "scope_of_supply": """
+#         Supply of 11kV XLPE insulated power cables for metro project.
+#         Cables must be 3-core with copper conductor.
+#         """,
+#         "technical_specifications": """
+#         Voltage Rating: 11 kV
+#         Conductor: Copper (Cu)
+#         Insulation: XLPE (Cross-linked Polyethylene)
+#         Cores: 3-core
+#         Standards: IS 7098 Part 2, IEC 60502
+#         Armoring: SWA (Steel Wire Armored)
+#         BIS Certification: Required
+#         """
+#     }
     
-    print("Step 1: Flattening RFP specifications...")
-    rfp_text = flatten_rfp_specs(mock_technical_brief)
-    print(f"✓ Normalized RFP text: {rfp_text[:100]}...\n")
+#     print("Step 1: Flattening RFP specifications...")
+#     rfp_text = flatten_rfp_specs(mock_technical_brief)
+#     print(f"✓ Normalized RFP text: {rfp_text[:100]}...\n")
     
-    print("Step 2: Matching products with weighted scoring...")
-    matched_products = match_products_advanced(
-        technical_brief=mock_technical_brief,
-        min_score=30.0,
-        max_results=10
-    )
-    print(f"✓ Found {len(matched_products)} matching products\n")
+#     print("Step 2: Matching products with weighted scoring...")
+#     matched_products = match_products_advanced(
+#         technical_brief=mock_technical_brief,
+#         min_score=30.0,
+#         max_results=10
+#     )
+#     print(f"✓ Found {len(matched_products)} matching products\n")
     
-    if matched_products:
-        print("Step 3: Getting top 3 recommendations...")
-        top_3 = get_top_recommendations(matched_products, top_n=3)
+#     if matched_products:
+#         print("Step 3: Getting top 3 recommendations...")
+#         top_3 = get_top_recommendations(matched_products, top_n=3)
         
-        print("\n" + "="*60)
-        print("TOP 3 PRODUCT RECOMMENDATIONS")
-        print("="*60 + "\n")
+#         print("\n" + "="*60)
+#         print("TOP 3 PRODUCT RECOMMENDATIONS")
+#         print("="*60 + "\n")
         
-        for i, product in enumerate(top_3, 1):
-            print(f"#{i} - {product['product_name']}")
-            print(f"    Product ID: {product['product_id']}")
-            print(f"    Match Score: {product['spec_match_percent']}%")
-            print(f"    Component Breakdown:")
-            for component, score in product['component_scores'].items():
-                weight = SPEC_WEIGHTS[component] * 100
-                print(f"      - {component.capitalize()}: {score}/100 (weight: {weight}%)")
-            print(f"    Unit Price: ₹{product['unit_price']}/meter")
-            print(f"    Lead Time: {product['lead_time_days']} days")
-            print(f"    BIS Certified: {product['bis_certified']}")
-            print()
+#         for i, product in enumerate(top_3, 1):
+#             print(f"#{i} - {product['product_name']}")
+#             print(f"    Product ID: {product['product_id']}")
+#             print(f"    Match Score: {product['spec_match_percent']}%")
+#             print(f"    Component Breakdown:")
+#             for component, score in product['component_scores'].items():
+#                 weight = SPEC_WEIGHTS[component] * 100
+#                 print(f"      - {component.capitalize()}: {score}/100 (weight: {weight}%)")
+#             print(f"    Unit Price: ₹{product['unit_price']}/meter")
+#             print(f"    Lead Time: {product['lead_time_days']} days")
+#             print(f"    BIS Certified: {product['bis_certified']}")
+#             print()
         
-        print("="*60)
+#         print("="*60)
         
-        # Summary
-        summary = format_recommendation_summary(top_3)
-        print(f"\nSummary:")
-        print(f"  Total Matches: {summary['total_matches']}")
-        print(f"  Average Score: {summary['average_match_score']}%")
-        print(f"  Best Score: {summary['best_match_score']}%")
-        print("="*60 + "\n")
-    else:
-        print("⚠️  No matching products found")
-        print("="*60 + "\n")
+#         # Summary
+#         summary = format_recommendation_summary(top_3)
+#         print(f"\nSummary:")
+#         print(f"  Total Matches: {summary['total_matches']}")
+#         print(f"  Average Score: {summary['average_match_score']}%")
+#         print(f"  Best Score: {summary['best_match_score']}%")
+#         print("="*60 + "\n")
+#     else:
+#         print("⚠️  No matching products found")
+#         print("="*60 + "\n")

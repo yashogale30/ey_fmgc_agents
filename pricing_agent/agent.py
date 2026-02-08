@@ -4,10 +4,6 @@ import pandas as pd
 import random
 import os
 
-# ============================================================
-# CONFIGURATION - UPDATE THESE PATHS
-# ============================================================
-# TODO: Replace with actual path to your pricing database
 PRICING_DATABASE_PATH = os.getenv("PRICING_DB_PATH", "/Users/yashogale/codes/ey_agents/OEM_Product_Database.xlsx")
 
 # ============================================================
@@ -231,11 +227,9 @@ def calculate_tender_pricing(oem_recommendations: list) -> dict:
             })
             continue
         
-        # Calculate actual product cost
         unit_price = pricing_info["unit_price"]
         min_order_qty = pricing_info["min_order_qty"]
         
-        # Conservative quantity estimate (can be improved with RFP parsing)
         quantity_multiplier = 1.0
         
         product_cost = calculate_product_cost(
@@ -478,78 +472,78 @@ root_agent = pricing_agent
 # ============================================================
 # TEST EXECUTION
 # ============================================================
-if __name__ == "__main__":
-    print("\n" + "="*60)
-    print("Testing Pricing Agent")
-    print("="*60 + "\n")
+# if __name__ == "__main__":
+#     print("\n" + "="*60)
+#     print("Testing Pricing Agent")
+#     print("="*60 + "\n")
     
-    # Mock OEM recommendations (as would come from Technical Agent)
-    mock_oem_recommendations = [
-        {
-            "product_id": "PROD_001",
-            "product_name": "11kV XLPE Cable",
-            "spec_match_percent": 95
-        },
-        {
-            "product_id": "PROD_002",
-            "product_name": "33kV Power Cable",
-            "spec_match_percent": 88
-        }
-    ]
+#     # Mock OEM recommendations (as would come from Technical Agent)
+#     mock_oem_recommendations = [
+#         {
+#             "product_id": "PROD_001",
+#             "product_name": "11kV XLPE Cable",
+#             "spec_match_percent": 95
+#         },
+#         {
+#             "product_id": "PROD_002",
+#             "product_name": "33kV Power Cable",
+#             "spec_match_percent": 88
+#         }
+#     ]
     
-    # Mock pricing brief (as would come from Master Agent)
-    mock_pricing_brief = {
-        "rfp_title": "Metro Phase 3 Power Cable Supply",
-        "tests_and_acceptance": """
-        All products must undergo:
-        - High voltage test at 50kV
-        - Insulation resistance test
-        - Fire resistance test as per IS standards
-        - Electrical acceptance testing
-        """
-    }
+#     # Mock pricing brief (as would come from Master Agent)
+#     mock_pricing_brief = {
+#         "rfp_title": "Metro Phase 3 Power Cable Supply",
+#         "tests_and_acceptance": """
+#         All products must undergo:
+#         - High voltage test at 50kV
+#         - Insulation resistance test
+#         - Fire resistance test as per IS standards
+#         - Electrical acceptance testing
+#         """
+#     }
     
-    # Test tender pricing calculation
-    print("Step 1: Calculating tender pricing...")
-    tender_pricing = calculate_tender_pricing(mock_oem_recommendations)
+#     # Test tender pricing calculation
+#     print("Step 1: Calculating tender pricing...")
+#     tender_pricing = calculate_tender_pricing(mock_oem_recommendations)
     
-    if "error" not in tender_pricing:
-        print(f"✓ Base total: ₹{tender_pricing['base_total']:,.2f}")
-        print(f"✓ Margin: {tender_pricing['margin_percentage']}%")
-        print(f"✓ Material total: ₹{tender_pricing['final_price']:,.2f}\n")
-    else:
-        print(f"✗ Error: {tender_pricing['error']}\n")
+#     if "error" not in tender_pricing:
+#         print(f"✓ Base total: ₹{tender_pricing['base_total']:,.2f}")
+#         print(f"✓ Margin: {tender_pricing['margin_percentage']}%")
+#         print(f"✓ Material total: ₹{tender_pricing['final_price']:,.2f}\n")
+#     else:
+#         print(f"✗ Error: {tender_pricing['error']}\n")
     
-    # Test test costs calculation
-    print("Step 2: Calculating test costs...")
-    test_costs_info = calculate_test_costs(mock_pricing_brief)
-    print(f"✓ Tests identified: {test_costs_info['tests_identified']}")
-    print(f"✓ Testing total: ₹{test_costs_info['total_test_cost']:,.2f}\n")
+#     # Test test costs calculation
+#     print("Step 2: Calculating test costs...")
+#     test_costs_info = calculate_test_costs(mock_pricing_brief)
+#     print(f"✓ Tests identified: {test_costs_info['tests_identified']}")
+#     print(f"✓ Testing total: ₹{test_costs_info['total_test_cost']:,.2f}\n")
     
-    # Consolidate final pricing
-    print("Step 3: Consolidating final pricing...")
-    final_pricing = consolidate_final_pricing(tender_pricing, test_costs_info)
+#     # Consolidate final pricing
+#     print("Step 3: Consolidating final pricing...")
+#     final_pricing = consolidate_final_pricing(tender_pricing, test_costs_info)
     
-    print("\n" + "="*60)
-    print("FINAL PRICING BREAKDOWN")
-    print("="*60)
-    print(f"Material Cost:  ₹{final_pricing['summary']['material_cost']:,.2f}")
-    print(f"Testing Cost:   ₹{final_pricing['summary']['testing_cost']:,.2f}")
-    print(f"{'─'*60}")
-    print(f"GRAND TOTAL:    ₹{final_pricing['summary']['grand_total']:,.2f}")
-    print("="*60 + "\n")
+#     print("\n" + "="*60)
+#     print("FINAL PRICING BREAKDOWN")
+#     print("="*60)
+#     print(f"Material Cost:  ₹{final_pricing['summary']['material_cost']:,.2f}")
+#     print(f"Testing Cost:   ₹{final_pricing['summary']['testing_cost']:,.2f}")
+#     print(f"{'─'*60}")
+#     print(f"GRAND TOTAL:    ₹{final_pricing['summary']['grand_total']:,.2f}")
+#     print("="*60 + "\n")
     
-    # Detailed breakdown
-    print("Product Details:")
-    for product in final_pricing['material_costs']['products']:
-        print(f"  • {product['product_name']} ({product['product_id']})")
-        if product['status'] == 'calculated':
-            print(f"    ₹{product['unit_price']}/m × {product['min_order_qty']}m = ₹{product['product_cost']:,.2f}")
-        else:
-            print(f"    {product['note']}: ₹{product['cost']:,.2f}")
+#     # Detailed breakdown
+#     print("Product Details:")
+#     for product in final_pricing['material_costs']['products']:
+#         print(f"  • {product['product_name']} ({product['product_id']})")
+#         if product['status'] == 'calculated':
+#             print(f"    ₹{product['unit_price']}/m × {product['min_order_qty']}m = ₹{product['product_cost']:,.2f}")
+#         else:
+#             print(f"    {product['note']}: ₹{product['cost']:,.2f}")
     
-    print(f"\nTest Details:")
-    for test in final_pricing['testing_costs']['tests']:
-        print(f"  • {test['test']}: ₹{test['cost']:,}")
+#     print(f"\nTest Details:")
+#     for test in final_pricing['testing_costs']['tests']:
+#         print(f"  • {test['test']}: ₹{test['cost']:,}")
     
-    print("\n" + "="*60 + "\n")
+#     print("\n" + "="*60 + "\n")

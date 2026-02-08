@@ -6,10 +6,6 @@ import os
 from datetime import datetime
 from typing import List, Dict, Any
 
-# ============================================================
-# CONFIGURATION - UPDATE THESE PATHS
-# ============================================================
-# TODO: Replace with actual path to your product database
 PRODUCT_DATABASE_PATH = os.getenv("PRODUCT_DB_PATH", "/mnt/data/product_database.xlsx")
 
 # ============================================================
@@ -22,11 +18,11 @@ PRODUCT_DATABASE_PATH = os.getenv("PRODUCT_DB_PATH", "/mnt/data/product_database
 # - Government procurement scoring guidelines (GEM, Public Procurement)
 
 SCORING_WEIGHTS = {
-    'technical_match': 0.35,       # Product-requirement alignment (most critical)
-    'price_competitiveness': 0.25, # Cost optimization
-    'delivery_capability': 0.15,   # Timeline feasibility
-    'compliance': 0.15,            # Certifications & quality assurance
-    'risk_score': 0.10             # Risk mitigation
+    'technical_match': 0.35,      
+    'price_competitiveness': 0.25, 
+    'delivery_capability': 0.15,   
+    'compliance': 0.15,            
+    'risk_score': 0.10             
 }
 
 # Price scoring parameters
@@ -128,7 +124,6 @@ def score_technical_match(matches: List[Dict]) -> Dict[str, Any]:
         }
     
     # Calculate weighted score with exponential decay
-    # Top match gets full weight, subsequent matches get progressively less
     total_score = 0.0
     total_weight = 0.0
     
@@ -296,8 +291,6 @@ def score_delivery_capability(
     lead_times = [m.get('lead_time_days', 0) for m in matches if m]
     avg_lead_time = sum(lead_times) / len(lead_times) if lead_times else 0
     
-    # Base score: inverse relationship with lead time
-    # Score = 100 for 0 days, declining to 0 for 90+ days
     base_score = max(0, 100 - (avg_lead_time * 1.1))
     
     # Calculate urgency penalty if deadline provided
@@ -377,16 +370,13 @@ def score_compliance(matches: List[Dict]) -> Dict[str, Any]:
         product_row = product_db[product_db['Product_ID'] == product_id]
         
         if not product_row.empty:
-            # BIS Certification
             if product_row['BIS_Certified'].iloc[0]:
                 bis_count += 1
             
-            # Standards compliance (check if not empty)
             standards = str(product_row.get('Standards_Compliance', [''])).iloc[0] if 'Standards_Compliance' in product_row else ''
             if standards and standards.lower() != 'nan' and len(standards) > 0:
                 standards_count += 1
             
-            # Warranty
             warranty = product_row.get('Warranty_Years', [0]).iloc[0] if 'Warranty_Years' in product_row else 0
             total_warranty += float(warranty)
             
@@ -469,13 +459,11 @@ def score_risk_assessment(matches: List[Dict]) -> Dict[str, Any]:
             moqs.append(product_row['Min_Order_Qty_Meters'].iloc[0])
     
     if len(moqs) > 1:
-        # Calculate coefficient of variation
         mean_moq = sum(moqs) / len(moqs)
         variance = sum((x - mean_moq) ** 2 for x in moqs) / len(moqs)
         std_dev = math.sqrt(variance)
         cv = (std_dev / mean_moq) if mean_moq > 0 else 0
         
-        # Lower CV = higher score (more consistent)
         consistency_score = max(0, 20 - (cv * 40))
     else:
         consistency_score = 20  # Single product or perfect consistency
@@ -572,7 +560,6 @@ def calculate_final_score(
     else:
         grade = 'D'
     
-    # Generate recommendation
     recommendation = generate_recommendation(final_score, grade)
     
     return {
@@ -683,79 +670,79 @@ root_agent = scoring_agent
 # ============================================================
 # TEST EXECUTION
 # ============================================================
-if __name__ == "__main__":
-    print("\n" + "="*70)
-    print("Testing Comprehensive RFP Scoring Agent")
-    print("="*70 + "\n")
+# if __name__ == "__main__":
+#     print("\n" + "="*70)
+#     print("Testing Comprehensive RFP Scoring Agent")
+#     print("="*70 + "\n")
     
-    # Mock matched products
-    mock_matches = [
-        {
-            "product_id": "PROD_001",
-            "product_name": "11kV XLPE Cable",
-            "category": "Power Cables",
-            "spec_match_percent": 92.5,
-            "lead_time_days": 30
-        },
-        {
-            "product_id": "PROD_002",
-            "product_name": "33kV Power Cable",
-            "category": "Power Cables",
-            "spec_match_percent": 85.0,
-            "lead_time_days": 35
-        },
-        {
-            "product_id": "PROD_003",
-            "product_name": "Control Cable",
-            "category": "Control Cables",
-            "spec_match_percent": 78.5,
-            "lead_time_days": 28
-        }
-    ]
+#     # Mock matched products
+#     mock_matches = [
+#         {
+#             "product_id": "PROD_001",
+#             "product_name": "11kV XLPE Cable",
+#             "category": "Power Cables",
+#             "spec_match_percent": 92.5,
+#             "lead_time_days": 30
+#         },
+#         {
+#             "product_id": "PROD_002",
+#             "product_name": "33kV Power Cable",
+#             "category": "Power Cables",
+#             "spec_match_percent": 85.0,
+#             "lead_time_days": 35
+#         },
+#         {
+#             "product_id": "PROD_003",
+#             "product_name": "Control Cable",
+#             "category": "Control Cables",
+#             "spec_match_percent": 78.5,
+#             "lead_time_days": 28
+#         }
+#     ]
     
-    mock_estimated_price = 850000.0
-    mock_deadline = "2026-05-15T00:00:00"
+#     mock_estimated_price = 850000.0
+#     mock_deadline = "2026-05-15T00:00:00"
     
-    print("="*70)
-    print("INPUTS:")
-    print("="*70)
-    print(f"Matched Products: {len(mock_matches)}")
-    print(f"Estimated Price: ₹{mock_estimated_price:,.2f}")
-    print(f"Deadline: {mock_deadline}\n")
+#     print("="*70)
+#     print("INPUTS:")
+#     print("="*70)
+#     print(f"Matched Products: {len(mock_matches)}")
+#     print(f"Estimated Price: ₹{mock_estimated_price:,.2f}")
+#     print(f"Deadline: {mock_deadline}\n")
     
-    # Calculate comprehensive score
-    print("Calculating comprehensive RFP score...\n")
-    score_result = calculate_final_score(
-        matches=mock_matches,
-        estimated_price=mock_estimated_price,
-        rfp_deadline=mock_deadline
-    )
+#     # Calculate comprehensive score
+#     print("Calculating comprehensive RFP score...\n")
+#     score_result = calculate_final_score(
+#         matches=mock_matches,
+#         estimated_price=mock_estimated_price,
+#         rfp_deadline=mock_deadline
+#     )
     
-    print("="*70)
-    print("SCORING RESULTS")
-    print("="*70)
-    print(f"Final Score: {score_result['final_score']}/100")
-    print(f"Grade: {score_result['grade']}")
-    print(f"Normalized Score: {score_result['normalized_score']}")
-    print()
+#     print("="*70)
+#     print("SCORING RESULTS")
+#     print("="*70)
+#     print(f"Final Score: {score_result['final_score']}/100")
+#     print(f"Grade: {score_result['grade']}")
+#     print(f"Normalized Score: {score_result['normalized_score']}")
+#     print()
     
-    print("─"*70)
-    print("COMPONENT SCORES (Raw):")
-    print("─"*70)
-    for component, score in score_result['component_scores'].items():
-        weight = SCORING_WEIGHTS[component] * 100
-        print(f"  {component.replace('_', ' ').title():30s}: {score:6.2f}/100 (weight: {weight:.0f}%)")
-    print()
+#     print("─"*70)
+#     print("COMPONENT SCORES (Raw):")
+#     print("─"*70)
+#     for component, score in score_result['component_scores'].items():
+#         weight = SCORING_WEIGHTS[component] * 100
+#         print(f"  {component.replace('_', ' ').title():30s}: {score:6.2f}/100 (weight: {weight:.0f}%)")
+#     print()
     
-    print("─"*70)
-    print("WEIGHTED CONTRIBUTIONS:")
-    print("─"*70)
-    for component, contribution in score_result['weighted_contributions'].items():
-        print(f"  {component.replace('_', ' ').title():30s}: {contribution:6.2f} points")
-    print()
+#     print("─"*70)
+#     print("WEIGHTED CONTRIBUTIONS:")
+#     print("─"*70)
+#     for component, contribution in score_result['weighted_contributions'].items():
+#         print(f"  {component.replace('_', ' ').title():30s}: {contribution:6.2f} points")
+#     print()
     
-    print("="*70)
-    print("RECOMMENDATION:")
-    print("="*70)
-    print(f"{score_result['recommendation']}")
-    print("="*70 + "\n")
+#     print("="*70)
+#     print("RECOMMENDATION:")
+#     print("="*70)
+#     print(f"{score_result['recommendation']}")
+#     print("="*70 + "\n")

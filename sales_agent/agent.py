@@ -30,7 +30,6 @@ def parse_date(date_str):
     if not date_str:
         return None
     
-    # Handle string representation
     date_str = str(date_str).strip()
     
     formats = [
@@ -45,7 +44,6 @@ def parse_date(date_str):
     
     for fmt in formats:
         try:
-            # Remove 'Z' suffix if present
             clean_date = date_str.replace("Z", "")
             return datetime.strptime(clean_date, fmt)
         except ValueError:
@@ -135,7 +133,6 @@ def scrap() -> dict:
         
         sections = rfp.get("sections", {})
         
-        # Create standardized RFP structure
         upcoming.append({
             "projectName": rfp.get("project_name") or rfp.get("projectName", ""),
             "project_name": rfp.get("project_name") or rfp.get("projectName", ""),
@@ -152,7 +149,7 @@ def scrap() -> dict:
             "pricing_details": sections.get("6. Pricing Details", ""),
             "evaluation_criteria": sections.get("7. Evaluation Criteria", ""),
             "submission_format": sections.get("8. Submission Format", ""),
-            "sections": sections  # Keep original sections structure
+            "sections": sections 
         })
     
     if not upcoming:
@@ -199,7 +196,6 @@ def select_best_rfp(scraped_data: dict) -> dict:
     
     print(f"📊 Scoring {len(rfps)} RFPs...")
     
-    # Define relevance keywords (customize based on your business)
     SALES_KEYWORDS = [
         "power", "cable", "electrical", "supply",
         "infrastructure", "metro", "substation", "transformer",
@@ -307,54 +303,53 @@ No explanations. No commentary. Execute the workflow.
     description="Fetches RFPs from API and selects the best sales opportunity."
 )
 
-# Root agent (required by ADK)
 root_agent = sales_agent
 
 # -------------------------------
 # Test Execution
 # -------------------------------
-if __name__ == "__main__":
-    print("\n" + "="*50)
-    print("Testing Sales Agent Pipeline")
-    print("="*50 + "\n")
+# if __name__ == "__main__":
+#     print("\n" + "="*50)
+#     print("Testing Sales Agent Pipeline")
+#     print("="*50 + "\n")
     
-    # Test scraping
-    print("=" * 50)
-    print("STEP 1: Scraping RFPs")
-    print("=" * 50 + "\n")
+#     # Test scraping
+#     print("=" * 50)
+#     print("STEP 1: Scraping RFPs")
+#     print("=" * 50 + "\n")
     
-    result = scrap()
+#     result = scrap()
     
-    if result.get("status") == "success":
-        print(f"\n✓ Successfully scraped {len(result.get('data', []))} RFPs\n")
-    else:
-        print(f"\n✗ Scraping failed: {result.get('error', 'Unknown error')}")
-        print(f"   Status: {result.get('status', 'unknown')}\n")
+#     if result.get("status") == "success":
+#         print(f"\n✓ Successfully scraped {len(result.get('data', []))} RFPs\n")
+#     else:
+#         print(f"\n✗ Scraping failed: {result.get('error', 'Unknown error')}")
+#         print(f"   Status: {result.get('status', 'unknown')}\n")
     
-    # Test selection
-    print("=" * 50)
-    print("STEP 2: Selecting Best RFP")
-    print("=" * 50 + "\n")
+#     # Test selection
+#     print("=" * 50)
+#     print("STEP 2: Selecting Best RFP")
+#     print("=" * 50 + "\n")
     
-    if result.get('data'):
-        best = select_best_rfp(result)
+#     if result.get('data'):
+#         best = select_best_rfp(result)
         
-        if not best.get("error"):
-            print("\n" + "="*50)
-            print("BEST RFP SELECTED:")
-            print("="*50)
-            print(f"Project: {best.get('projectName') or best.get('project_name')}")
-            print(f"Issued by: {best.get('issued_by')}")
-            print(f"Category: {best.get('category')}")
-            print(f"Deadline: {best.get('submissionDeadline') or best.get('submission_deadline')}")
-            print(f"Score: {best.get('sales_score')}")
-            print(f"Reference: {best.get('rfp_reference')}")
-            print("="*50 + "\n")
-        else:
-            print(f"✗ Selection failed: {best.get('error')}\n")
-    else:
-        print("⚠️ No RFPs available for selection\n")
+#         if not best.get("error"):
+#             print("\n" + "="*50)
+#             print("BEST RFP SELECTED:")
+#             print("="*50)
+#             print(f"Project: {best.get('projectName') or best.get('project_name')}")
+#             print(f"Issued by: {best.get('issued_by')}")
+#             print(f"Category: {best.get('category')}")
+#             print(f"Deadline: {best.get('submissionDeadline') or best.get('submission_deadline')}")
+#             print(f"Score: {best.get('sales_score')}")
+#             print(f"Reference: {best.get('rfp_reference')}")
+#             print("="*50 + "\n")
+#         else:
+#             print(f"✗ Selection failed: {best.get('error')}\n")
+#     else:
+#         print("⚠️ No RFPs available for selection\n")
         
-    print("="*50)
-    print("Test Complete")
-    print("="*50 + "\n")
+#     print("="*50)
+#     print("Test Complete")
+#     print("="*50 + "\n")

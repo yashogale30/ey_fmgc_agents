@@ -17,7 +17,6 @@ def prepare_briefs(best_sales_rfp: dict) -> dict:
     Returns both briefs in a structured format for session state.
     """
     
-    # Validate input
     if not best_sales_rfp or best_sales_rfp.get("error"):
         return {
             "error": "Invalid or missing RFP data",
@@ -27,7 +26,6 @@ def prepare_briefs(best_sales_rfp: dict) -> dict:
     
     sections = best_sales_rfp.get("sections", {})
     
-    # If sections is missing, try to extract from flattened structure
     if not sections:
         sections = {
             "2. Scope of Supply": best_sales_rfp.get("scope_of_supply", ""),
@@ -186,51 +184,51 @@ root_agent = SequentialAgent(
 # ============================================================
 # TEST EXECUTION
 # ============================================================
-if __name__ == "__main__":
-    print("\n" + "="*60)
-    print("Testing Master Agent Brief Preparation")
-    print("="*60 + "\n")
+# if __name__ == "__main__":
+#     print("\n" + "="*60)
+#     print("Testing Master Agent Brief Preparation")
+#     print("="*60 + "\n")
     
-    # Mock RFP data (as would come from Sales Agent)
-    mock_rfp = {
-        "projectName": "Metro Phase 3 Power Cable Supply",
-        "project_name": "Metro Phase 3 Power Cable Supply",
-        "issued_by": "Delhi Metro Rail Corporation",
-        "category": "Power Cables",
-        "submissionDeadline": "2026-04-15T00:00:00",
-        "submission_deadline": "2026-04-15T00:00:00",
-        "rfp_reference": "DMRC/2026/PC/001",
-        "sections": {
-            "1. Project Overview": "Supply of power cables for metro expansion",
-            "2. Scope of Supply": "11kV XLPE cables, 3-core, copper conductor",
-            "3. Technical Specifications": "Voltage: 11kV, Conductor: Copper, Insulation: XLPE, Cores: 3, Standards: IS 7098",
-            "4. Acceptance & Test Requirements": "High voltage test, Insulation resistance test, Fire resistance test",
-            "5. Delivery Timeline": "90 days from order",
-            "6. Pricing Details": "Per meter pricing, 2-year warranty required",
-            "7. Evaluation Criteria": "Technical 40%, Price 35%, Delivery 25%"
-        }
-    }
+#     # Mock RFP data (as would come from Sales Agent)
+#     mock_rfp = {
+#         "projectName": "Metro Phase 3 Power Cable Supply",
+#         "project_name": "Metro Phase 3 Power Cable Supply",
+#         "issued_by": "Delhi Metro Rail Corporation",
+#         "category": "Power Cables",
+#         "submissionDeadline": "2026-04-15T00:00:00",
+#         "submission_deadline": "2026-04-15T00:00:00",
+#         "rfp_reference": "DMRC/2026/PC/001",
+#         "sections": {
+#             "1. Project Overview": "Supply of power cables for metro expansion",
+#             "2. Scope of Supply": "11kV XLPE cables, 3-core, copper conductor",
+#             "3. Technical Specifications": "Voltage: 11kV, Conductor: Copper, Insulation: XLPE, Cores: 3, Standards: IS 7098",
+#             "4. Acceptance & Test Requirements": "High voltage test, Insulation resistance test, Fire resistance test",
+#             "5. Delivery Timeline": "90 days from order",
+#             "6. Pricing Details": "Per meter pricing, 2-year warranty required",
+#             "7. Evaluation Criteria": "Technical 40%, Price 35%, Delivery 25%"
+#         }
+#     }
     
-    print("Step 1: Testing brief preparation...")
-    result = prepare_briefs(mock_rfp)
+#     print("Step 1: Testing brief preparation...")
+#     result = prepare_briefs(mock_rfp)
     
-    if result.get("status") == "success":
-        print("✓ Briefs prepared successfully\n")
+#     if result.get("status") == "success":
+#         print("✓ Briefs prepared successfully\n")
         
-        print("="*60)
-        print("TECHNICAL BRIEF:")
-        print("="*60)
-        for key, value in result["technical_brief"].items():
-            print(f"{key}: {value[:100] if isinstance(value, str) and len(value) > 100 else value}")
+#         print("="*60)
+#         print("TECHNICAL BRIEF:")
+#         print("="*60)
+#         for key, value in result["technical_brief"].items():
+#             print(f"{key}: {value[:100] if isinstance(value, str) and len(value) > 100 else value}")
         
-        print("\n" + "="*60)
-        print("PRICING BRIEF:")
-        print("="*60)
-        for key, value in result["pricing_brief"].items():
-            print(f"{key}: {value[:100] if isinstance(value, str) and len(value) > 100 else value}")
+#         print("\n" + "="*60)
+#         print("PRICING BRIEF:")
+#         print("="*60)
+#         for key, value in result["pricing_brief"].items():
+#             print(f"{key}: {value[:100] if isinstance(value, str) and len(value) > 100 else value}")
         
-        print("\n" + "="*60)
-        print("✓ Master Agent test completed successfully")
-        print("="*60 + "\n")
-    else:
-        print(f"✗ Error: {result.get('error')}")
+#         print("\n" + "="*60)
+#         print("✓ Master Agent test completed successfully")
+#         print("="*60 + "\n")
+#     else:
+#         print(f"✗ Error: {result.get('error')}")

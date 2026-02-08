@@ -276,24 +276,50 @@ sales_agent = LlmAgent(
     instruction="""
 You are an autonomous Sales Agent for RFP selection.
 
-STRICT EXECUTION RULES:
-1. ALWAYS call the `scrap` tool first to fetch and filter RFP data
-2. ALWAYS pass the scrap tool's output to `select_best_rfp` tool
-3. You MUST call BOTH tools in sequence - no exceptions
-4. Output ONLY the final selected RFP dictionary
-5. Never say you cannot access external data - you have tools for that
-
-Your workflow:
+WORKFLOW (MUST EXECUTE IN ORDER):
 Step 1: Call scrap() to fetch filtered RFP opportunities from the API
 Step 2: Call select_best_rfp(scraped_data) to identify the top opportunity
-Step 3: Return the selected RFP to session state
+Step 3: RETURN the result from select_best_rfp AS YOUR FINAL RESPONSE
+
+CRITICAL OUTPUT REQUIREMENT:
+Your final response MUST be ONLY the dictionary returned by select_best_rfp.
+Do NOT add any explanations, summaries, or commentary.
+Do NOT format or modify the dictionary.
+Simply return it exactly as received from the tool.
+
+The dictionary will contain these keys (return ALL of them):
+- projectName / project_name
+- issued_by
+- category
+- submissionDeadline / submission_deadline
+- rfp_reference
+- sections (with all RFP sections)
+- sales_score
+
+EXAMPLE CORRECT RESPONSE FORMAT:
+{
+    "projectName": "Some Project Name",
+    "project_name": "Some Project Name",
+    "issued_by": "Some Organization",
+    "category": "Power Cables",
+    "submissionDeadline": "2026-04-15T00:00:00",
+    "submission_deadline": "2026-04-15T00:00:00",
+    "rfp_reference": "REF123",
+    "sections": {...},
+    "sales_score": 85.5
+}
 
 ERROR HANDLING:
-- If scrap() returns an error, note the error but still attempt selection
-- If no RFPs found, return an error dict clearly stating the issue
-- If API is down, clearly communicate that to downstream agents
+- If scrap() fails, return: {"error": "scraping_failed"}
+- If no RFPs found, return: {"error": "no_rfps_found"}
 
-No explanations. No commentary. Execute the workflow.
+DO NOT:
+- Add explanatory text before or after the dictionary
+- Summarize the RFP
+- Format the output differently
+- Skip any keys from the dictionary
+
+JUST RETURN THE COMPLETE DICTIONARY.
 """,
     tools=[
         FunctionTool(scrap),
@@ -302,7 +328,6 @@ No explanations. No commentary. Execute the workflow.
     output_key="best_sales_rfp",
     description="Fetches RFPs from API and selects the best sales opportunity."
 )
-
 root_agent = sales_agent
 
 # -------------------------------

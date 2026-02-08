@@ -406,11 +406,16 @@ technical_agent = LlmAgent(
 You are the Advanced Technical Matching Agent.
 
 INPUTS (from session state):
-- {technical_brief}: RFP technical requirements and specifications from master_output
+- {master_output}: Contains technical_brief and pricing_brief
+
+CRITICAL FIRST STEP:
+Before doing anything else, extract the technical_brief from master_output:
+    technical_brief = master_output["technical_brief"]
 
 EXECUTION WORKFLOW:
-1. Call match_products_advanced with the technical_brief
-2. The tool will:
+1. Extract technical_brief from master_output (as shown above)
+2. Call match_products_advanced(technical_brief)
+   The tool will:
    a. Load product database (with fallback to mock data if unavailable)
    b. Flatten and normalize RFP technical text
    c. For EACH product in database:
@@ -437,11 +442,13 @@ MATCHING ALGORITHM:
 - Configurable minimum threshold (default: 30%)
 
 ERROR HANDLING:
-- If technical_brief is missing or empty, return empty list
+- If master_output is missing, return empty list
+- If technical_brief is missing or empty inside master_output, return empty list
 - If database fails to load, use mock data for testing
 - If no matches found, return empty list with status message
 
 STRICT RULES:
+- ALWAYS extract technical_brief from master_output first
 - Use ONLY the provided tools for all calculations
 - DO NOT invent specifications or scores
 - DO NOT modify the SPEC_WEIGHTS configuration
